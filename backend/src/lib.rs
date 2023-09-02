@@ -11,7 +11,7 @@ mod imagecrop;
 const MAX_WIDTH: u32 = 600;
 const MAX_HEIGHT: u32 = 80;
 const MAX_FONT_SIZE: f32 = 125.0;
-const FAR_LEFT: u32 = 100;
+const FAR_LEFT: u32 = 140;
 const FAR_TOP: u32 = 1000;
 
 const FONT_FILE: &[u8] = include_bytes!("PingFang-Bold.ttf") as &[u8];
