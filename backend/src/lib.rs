@@ -92,12 +92,25 @@ where
     let y0 = center.1;
 
     while x <= y {
+        // drawing::draw_line_segment_mut(
+        //     canvas,
+        //     ((x0 - x) as f32, (y0 + y) as f32),
+        //     ((x0 + x) as f32, (y0 + y) as f32),
+        //     color,
+        // );
         drawing::draw_line_segment_mut(
             canvas,
+            ((x0 - radius) as f32, (y0 + y) as f32),
             ((x0 - x) as f32, (y0 + y) as f32),
-            ((x0 + x) as f32, (y0 + y) as f32),
             color,
         );
+        drawing::draw_line_segment_mut(
+            canvas,
+            ((x0 + x) as f32, (y0 + y) as f32),
+            ((x0 + radius) as f32, (y0 + y) as f32),
+            color,
+        );
+
         // drawing::draw_line_segment_mut(
         //     canvas,
         //     ((x0 - y) as f32, (y0 + x) as f32),
@@ -106,10 +119,24 @@ where
         // );
         drawing::draw_line_segment_mut(
             canvas,
-            ((x0 - x) as f32, (y0 - y) as f32),
-            ((x0 + x) as f32, (y0 - y) as f32),
+            ((x0 - radius) as f32, (y0 + x) as f32),
+            ((x0 - y) as f32, (y0 + x) as f32),
             color,
         );
+        drawing::draw_line_segment_mut(
+            canvas,
+            ((x0 + y) as f32, (y0 + x) as f32),
+            ((x0 + radius) as f32, (y0 + x) as f32),
+            color,
+        );
+
+        // drawing::draw_line_segment_mut(
+        //     canvas,
+        //     ((x0 - x) as f32, (y0 - y) as f32),
+        //     ((x0 + x) as f32, (y0 - y) as f32),
+        //     color,
+        // );
+
         // drawing::draw_line_segment_mut(
         //     canvas,
         //     ((x0 - y) as f32, (y0 - x) as f32),
