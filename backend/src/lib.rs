@@ -86,7 +86,7 @@ fn draw_avatar(body: Vec<u8>, width: u32, height: u32, left: u32, top: u32) -> i
 
     let x = width as i32 / 2;
     let a = 255 as u8;
-    drawing::draw_hollow_circle_mut(&mut avatar, (x, x), x, image::Rgba([a; 4]));
+    drawing::draw_filled_circle_mut(&mut avatar, (x, x), x, image::Rgba([a; 4]));
 
     let mut img = image::load_from_memory(TEMPLATE_BUF).unwrap();
     image::imageops::overlay(&mut img, &avatar, left, top);
