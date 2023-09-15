@@ -180,7 +180,8 @@ where
 
 fn draw_avatar(body: Vec<u8>, width: u32, height: u32, left: u32, top: u32) -> image::DynamicImage {
     let mut avatar = image::load_from_memory(&body).unwrap();
-    avatar = avatar.resize(width, height, image::imageops::Lanczos3);
+
+    avatar = avatar.resize_exact(width, height, image::imageops::Lanczos3);
     let mut avatar = avatar.to_rgba8();
 
     let x = width as i32 / 2;
