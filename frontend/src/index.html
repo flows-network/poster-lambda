@@ -6,41 +6,6 @@
     <title>为 GOSIM Workshop 打 call</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
-    <script>
-function callService() {
-  var clientName = $('#input_1').val();
-  if (!clientName) {
-    alert('请输入名字')
-    return
-  }
-
-  $('#loading').show()
-  $('#process').prop('disabled', true);
-  
-  $.ajax({
-      url: '{BACKEND_SERVICE_URL}?text=' + encodeURIComponent(clientName),
-      type: "get",
-      timeout: 300000,
-      success: function (data) {
-        const img_url = "data:image/png;base64," + data;
-        $('#wm_img').prop('src', img_url);
-        $('#process').prop('disabled', false);
-        $('#loading').hide()
-      },
-      error: function(jqXHR, exception){
-        console.log("Error Status" + jqXHR.statusText);
-        console.log("Error Resp" + jqXHR.responseText);
-        alert("服务繁忙，请稍后重试");
-        $('#process').prop('disabled', false);
-        $('#loading').hide()
-      }
-  });
-
-  return false;
-}
-    </script>
   </head>
   
   <body>
@@ -49,12 +14,15 @@ function callService() {
       <p class="lead"> GOSIM Workshop 共有 AI、Rust、Mobile & Web、Auto & Robotics、Metaverse & Gaming 五大 track。访问 <a href="https://workshop2023.gosim.org/">官网</a> 了解更多。 <a href="https://www.bagevent.com/widget/ticket/8682368">戳此处购票</a></p>
       <p class="small">这个自定义邀请海报程序使用 <a href="https://www.rust-lang.org/">Rust</a> 编写，并部署在 <a href="https://flows.network/">flows.network</a>，底层由<a href="https://github.com/WasmEdge/WasmEdge"> CNCF WasmEdge </a> 驱动。</p>
 
-      <form id="draw" enctype="multipart/form-data"></form>
+      <form enctype="multipart/form-data"></form>
         <div class="mb-3">
-          <label for="input_1" class="form-label small">请在下方输入你的名字，生成你的专属海报</label>
-          <input type="text" class="form-control" id="input_1">
+          <label for="input_1" class="form-label small">请在下方输入你的名字，并选择一个图片作为头像，生成你的专属海报</label>
+          <input type="text" class="form-control" id="input_name">
         </div>
-        <button type="submit" class="btn btn-primary" id="process" onclick="return callService();">
+        <div class="mb-3">
+          <input type="file" class="form-control" accept="image/*" id="input_file" />
+        </div>
+        <button type="button" class="btn btn-primary" id="draw" disabled>
           <span style="display: none;" class="spinner-border spinner-border-sm" id="loading" role="status" aria-hidden="true"></span>
           生成海报
         </button>
@@ -65,5 +33,76 @@ function callService() {
       </div>
 
     </div> <!-- /container -->
+
+    
+    <script>
+      const WEBHOOK_URL = '{BACKEND_SERVICE_URL}';
+      const [nameInput, loading, drawBtn, fileInput, resultImg] =
+        ['#input_name', '#loading', '#draw', '#input_file', '#wm_img'].map((id) => {
+          return document.querySelector(id);
+        });
+
+      fileInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) {
+          return;
+        }
+
+        if (file.size > 500 * 1024) {
+          alert('文件不能大于 500KB');
+          drawBtn.setAttribute('disabled', 'disabled');
+          return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+          alert('请选择图片文件');
+          drawBtn.setAttribute('disabled', 'disabled');
+          return;
+        }
+
+        drawBtn.removeAttribute('disabled');
+      });
+
+      drawBtn.addEventListener('click', function () {
+        if (!nameInput.value) {
+          alert('请输入名字');
+          return;
+        }
+        const files = fileInput.files;
+        if (!files || files.length !== 1) {
+          alert('请选择头像');
+          return;
+        }
+
+        loading.style.display = 'inline-block';
+        drawBtn.setAttribute('disabled', 'disabled');
+
+        const reader = new FileReader();
+        reader.onload = async function (e) {
+          try {
+            let response = await fetch(
+              WEBHOOK_URL +
+                `?text=${encodeURIComponent(nameInput.value)}` +
+                '&aw=160&ah=160&al=460&at=837&tl=240&tt=1020',
+              {
+                method: 'POST',
+                body: e.target.result,
+              }
+            );
+
+            const blob = await response.blob();
+            resultImg.src = URL.createObjectURL(blob);
+
+            loading.style.display = 'none';
+            drawBtn.removeAttribute('disabled');
+          } catch {
+            loading.style.display = 'none';
+            drawBtn.removeAttribute('disabled');
+            alert('失败请重试');
+          }
+        };
+        reader.readAsArrayBuffer(files[0]);
+      });
+    </script>
   </body>
 </html>
