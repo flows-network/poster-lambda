@@ -98,12 +98,12 @@ where
             ((x0 + x) as f32, (y0 + y) as f32),
             color,
         );
-        // drawing::draw_line_segment_mut(
-        //     canvas,
-        //     ((x0 - y) as f32, (y0 + x) as f32),
-        //     ((x0 + y) as f32, (y0 + x) as f32),
-        //     color,
-        // );
+        drawing::draw_line_segment_mut(
+            canvas,
+            ((x0 - y) as f32, (y0 + x) as f32),
+            ((x0 + y) as f32, (y0 + x) as f32),
+            color,
+        );
         // drawing::draw_line_segment_mut(
         //     canvas,
         //     ((x0 - x) as f32, (y0 - y) as f32),
@@ -132,7 +132,7 @@ fn draw_avatar(body: Vec<u8>, width: u32, height: u32, left: u32, top: u32) -> i
     avatar = avatar.resize(width, height, image::imageops::Lanczos3);
 
     let x = width as i32 / 2;
-    draw_filled_circle_mut(&mut avatar, (x, x), x, image::Rgba([123 as u8; 4]));
+    draw_filled_circle_mut(&mut avatar, (x, x), x, image::Rgba([0 as u8; 4]));
 
     let mut img = image::load_from_memory(TEMPLATE_BUF).unwrap();
     image::imageops::overlay(&mut img, &avatar, left, top);
