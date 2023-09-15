@@ -136,6 +136,18 @@ where
         //     ((x0 + x) as f32, (y0 - y) as f32),
         //     color,
         // );
+        drawing::draw_line_segment_mut(
+            canvas,
+            ((x0 - radius) as f32, (y0 - y) as f32),
+            ((x0 - x) as f32, (y0 - y) as f32),
+            color,
+        );
+        drawing::draw_line_segment_mut(
+            canvas,
+            ((x0 + x) as f32, (y0 - y) as f32),
+            ((x0 + radius) as f32, (y0 - y) as f32),
+            color,
+        );
 
         // drawing::draw_line_segment_mut(
         //     canvas,
@@ -143,6 +155,18 @@ where
         //     ((x0 + y) as f32, (y0 - x) as f32),
         //     color,
         // );
+        drawing::draw_line_segment_mut(
+            canvas,
+            ((x0 - radius) as f32, (y0 - x) as f32),
+            ((x0 - y) as f32, (y0 - x) as f32),
+            color,
+        );
+        drawing::draw_line_segment_mut(
+            canvas,
+            ((x0 + y) as f32, (y0 - x) as f32),
+            ((x0 + radius) as f32, (y0 - x) as f32),
+            color,
+        );
 
         x += 1;
         if p < 0 {
