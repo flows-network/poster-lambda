@@ -93,7 +93,6 @@ async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
     let text = qry.get("text").expect("No text provided").as_str().unwrap();
 
     let image = draw_text(text);
-    let image = base64::encode_config(image, base64::STANDARD);
     send_response(
         200,
         vec![
@@ -103,6 +102,6 @@ async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
                 String::from("*"),
             ),
         ],
-        image.as_bytes().to_vec(),
+        image,
     );
 }
