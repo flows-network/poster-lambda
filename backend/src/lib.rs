@@ -44,7 +44,7 @@ fn write_to_crop(watermark_text: &str) -> u32 {
     return corners.1.x - corners.0.x;
 }
 
-fn draw_text(text: &str) -> Vec<u8> {
+fn draw_text(mut img: image::DynamicImage, text: &str) -> Vec<u8> {
     let width = write_to_crop(text);
 
     let mut left = FAR_LEFT;
@@ -58,7 +58,6 @@ fn draw_text(text: &str) -> Vec<u8> {
         top = FAR_TOP + ((1.0 - (MAX_WIDTH as f32) / (width as f32)) * (MAX_HEIGHT as f32)) as u32;
     }
 
-    let mut img = image::load_from_memory(TEMPLATE_BUF).unwrap();
     let scale = Scale {
         x: font_size,
         y: font_size,
@@ -83,16 +82,40 @@ fn draw_text(text: &str) -> Vec<u8> {
     return buf;
 }
 
+fn draw_avatar(body: Vec<u8>, width: u32, height: u32, left: u32, top: u32) -> image::DynamicImage {
+    let mut avatar = image::load_from_memory(&body).unwrap();
+    avatar = avatar.resize(width, height, image::imageops::Lanczos3);
+
+    let mut img = image::load_from_memory(TEMPLATE_BUF).unwrap();
+    image::imageops::overlay(&mut img, &avatar, left, top);
+    img
+}
+
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
 pub async fn run() {
     request_received(handler).await;
 }
 
-async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
+fn get_qry(qry: &HashMap<String, Value>, key: &str, default: u32) -> u32 {
+    qry.get(key)
+        .unwrap_or(&Value::from(""))
+        .as_str()
+        .unwrap_or("")
+        .parse()
+        .unwrap_or(default)
+}
+
+async fn handler(qry: HashMap<String, Value>, body: Vec<u8>) {
     let text = qry.get("text").expect("No text provided").as_str().unwrap();
 
-    let image = draw_text(text);
+    let aw = get_qry(&qry, "aw", 0);
+    let ah = get_qry(&qry, "ah", 0);
+    let al = get_qry(&qry, "al", 0);
+    let at = get_qry(&qry, "at", 0);
+
+    let image = draw_avatar(body, aw, ah, al, at);
+    let image_buf = draw_text(image, text);
     send_response(
         200,
         vec![
@@ -102,6 +125,6 @@ async fn handler(qry: HashMap<String, Value>, _body: Vec<u8>) {
                 String::from("*"),
             ),
         ],
-        image,
+        image_buf,
     );
 }
