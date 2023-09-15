@@ -84,9 +84,15 @@ fn draw_avatar(body: Vec<u8>, width: u32, height: u32, left: u32, top: u32) -> i
     let mut avatar = image::load_from_memory(&body).unwrap();
     avatar = avatar.resize(width, height, image::imageops::Lanczos3);
 
-    let x = width as i32 / 2;
-    let a = 0 as u8;
-    drawing::draw_filled_circle_mut(&mut avatar, (x, x), x, image::Rgba([a; 4]));
+    let x = 0.552284749831;
+    drawing::draw_cubic_bezier_curve_mut(
+        &mut avatar,
+        (-1.0, 0.0),
+        (0.0, 1.0),
+        (-1.0, x),
+        (x - 1.0, 1.0),
+        image::Rgba([0 as u8; 4]),
+    );
 
     let mut img = image::load_from_memory(TEMPLATE_BUF).unwrap();
     image::imageops::overlay(&mut img, &avatar, left, top);
