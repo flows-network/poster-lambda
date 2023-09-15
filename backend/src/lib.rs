@@ -11,8 +11,6 @@ mod imagecrop;
 const MAX_WIDTH: u32 = 600;
 const MAX_HEIGHT: u32 = 80;
 const MAX_FONT_SIZE: f32 = 125.0;
-const FAR_LEFT: u32 = 220;
-const FAR_TOP: u32 = 1000;
 
 const FONT_FILE: &[u8] = include_bytes!("PingFang-Bold.ttf") as &[u8];
 const TEMPLATE_BUF: &[u8] = include_bytes!("template.png") as &[u8];
@@ -44,18 +42,18 @@ fn write_to_crop(watermark_text: &str) -> u32 {
     return corners.1.x - corners.0.x;
 }
 
-fn draw_text(mut img: image::DynamicImage, text: &str) -> Vec<u8> {
+fn draw_text(mut img: image::DynamicImage, text: &str, far_left: u32, far_top: u32) -> Vec<u8> {
     let width = write_to_crop(text);
 
-    let mut left = FAR_LEFT;
-    let mut top = FAR_TOP;
+    let mut left = far_left;
+    let mut top = far_top;
     let mut font_size = MAX_FONT_SIZE;
 
     if width < MAX_WIDTH {
-        left = FAR_LEFT + (MAX_WIDTH - width) / 2;
+        left = far_left + (MAX_WIDTH - width) / 2;
     } else {
         font_size = (MAX_WIDTH as f32) / (width as f32) * MAX_FONT_SIZE;
-        top = FAR_TOP + ((1.0 - (MAX_WIDTH as f32) / (width as f32)) * (MAX_HEIGHT as f32)) as u32;
+        top = far_top + ((1.0 - (MAX_WIDTH as f32) / (width as f32)) * (MAX_HEIGHT as f32)) as u32;
     }
 
     let scale = Scale {
@@ -114,8 +112,11 @@ async fn handler(qry: HashMap<String, Value>, body: Vec<u8>) {
     let al = get_qry(&qry, "al", 0);
     let at = get_qry(&qry, "at", 0);
 
+    let tl = get_qry(&qry, "tl", 0);
+    let tt = get_qry(&qry, "tt", 0);
+
     let image = draw_avatar(body, aw, ah, al, at);
-    let image_buf = draw_text(image, text);
+    let image_buf = draw_text(image, text, tl, tt);
     send_response(
         200,
         vec![
