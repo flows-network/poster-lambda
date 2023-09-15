@@ -181,7 +181,7 @@ where
 fn draw_avatar(body: Vec<u8>, width: u32, height: u32, left: u32, top: u32) -> image::DynamicImage {
     let mut avatar = image::load_from_memory(&body).unwrap();
     avatar = avatar.resize(width, height, image::imageops::Lanczos3);
-    avatar = image::load_from_memory(&avatar.to_rgba8().into_vec()).unwrap();
+    let mut avatar = avatar.to_rgba8();
 
     let x = width as i32 / 2;
     draw_filled_circle_mut(&mut avatar, (x, x), x, image::Rgba([0 as u8; 4]));
