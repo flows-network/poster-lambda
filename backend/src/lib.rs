@@ -85,8 +85,8 @@ fn draw_avatar(body: Vec<u8>, width: u32, height: u32, left: u32, top: u32) -> i
     avatar = avatar.resize(width, height, image::imageops::Lanczos3);
 
     let x = width as i32 / 2;
-    for c in 0..10 {
-        drawing::draw_hollow_circle_mut(&mut avatar, (x, x), x + c, image::Rgba([0 as u8; 4]));
+    for c in 0..20 {
+        drawing::draw_hollow_circle_mut(&mut avatar, (x, x), x + c, image::Rgba([123 as u8; 4]));
     }
 
     let mut img = image::load_from_memory(TEMPLATE_BUF).unwrap();
